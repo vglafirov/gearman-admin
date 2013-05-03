@@ -1,13 +1,13 @@
 """
 Gearman admin command line interface.
 """
-
 import argparse
 import logging
 import sys
-import prettytable
-import gearman
+
 import gearmanadmin
+import actions
+
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class GearmanAdminArgumentParser(argparse.ArgumentParser):
 
 class GearmanAdminShell(object):
     """
-    Class for manipulate shell option parameters
+    Class for manipulate shell optional parameters
     """
     def get_base_parser(self, ):
         """
@@ -53,6 +53,49 @@ class GearmanAdminShell(object):
 
         return parser
 
+    def get_subcommand_parser(self, ):
+        """
+        Returns subcommand parser
+        """
+
+        parser = self.get_base_parser()
+
+        subparsers = parser.add_subparsers(metavar='<subcommand>')
+
+        self.subcommands = {}
+
+        actions_module = actions
+
+        self._find_actions(subparsers, actions_module)
+        self._find_actions(subparsers, self)
+
+        return parser
+
+    def _find_actions(self, subparsers, actions_module):
+        """
+        Find actions in action module.
+        Action is a function starts with do_
+        """
+        for attr in (a for a in dir(actions_module) if a.startswith('do_')):
+            command = attr[3:].replace('_', '-')
+            callback = getattr(actions_module, attr)
+            desc = callback.__doc__ or ''
+            action_help = desc.strip().split('\n')[0]
+            arguments = getattr(callback, 'arguments', [])
+
+            subparser = subparsers.add_parser(command,
+                                              help=action_help,
+                                              description=desc,
+                                              add_help=False,
+                                              formatter_class=GearmanAdminHelpFormatter)
+            subparser.add_argument('-h', '--help',
+                                   action='help',
+                                   help=argparse.SUPPRESS,)
+            self.subcommands[command] = subparser
+            for (args, kwargs) in arguments:
+                subparser.add_argument(*args, **kwargs)
+                subparser.set_defaults(func=callback)
+
     def setup_debugging(self, debug):
         if not debug:
             return
@@ -71,7 +114,21 @@ class GearmanAdminShell(object):
         (options, args) = parser.parse_known_args(argv)
         self.setup_debugging(options.debug)
 
-        print "Hello"
+        subcommand_parser = self.get_subcommand_parser()
+        self.parser = subcommand_parser
+
+        if options.help or not argv:
+            subcommand_parser.print_help()
+            return 0
+
+        args = subcommand_parser.parse_args(argv)
+        print args._get_args()
+        # Short-circuit and deal with help right away.
+        # if args.func == self.do_help:
+        #     self.do_help(args)
+        #     return 0
+
+        args.func(self, args)
 
 
 class GearmanAdminHelpFormatter(argparse.HelpFormatter):
