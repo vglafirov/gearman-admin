@@ -1,6 +1,5 @@
 """
 Gearman admin command line interface.
-Main module inspired by python-novaclient
 """
 
 import os
@@ -9,10 +8,9 @@ import logging
 import sys
 import prettytable
 import gearman
-#import gearmanadmin
+import gearmanadmin
 
 logger = logging.getLogger(__name__)
-
 
 
 class GearmanAdminArgumentParser(argparse.ArgumentParser):
@@ -22,7 +20,6 @@ class GearmanAdminArgumentParser(argparse.ArgumentParser):
 
     def __init__(self, *args, **kwargs):
         super(GearmanAdminArgumentParser, self).__init__(*args, **kwargs)
-
 
 
 class GearmanAdminShell(object):
@@ -38,26 +35,25 @@ class GearmanAdminShell(object):
             description=__doc__.strip(),
             epilog='See "gearman-admin help COMMAND" '
                    'for help on a specific command.',
-            add_help=False
-#            formatter_class=OpenStackHelpFormatter,
+            # add_help=False
+            # formatter_class=OpenStackHelpFormatter,
         )
 
-        parser.add_argument('-h', '--help',
-            action='store_true',
-            help=argparse.SUPPRESS,
-        )
+        # parser.add_argument('-h', '--help',
+        #     action='store_true',
+        #     help=argparse.SUPPRESS,
+        # )
 
         parser.add_argument('--version',
-                            action='version')#,
-#                            version=gearmanadmin.__version__)
+                            action='version')
+        #                   version=gearmanadmin.__version__)
 
         parser.add_argument('--debug',
-            default=False,
-            action='store_true',
-            help="Print debugging output")
+                            default=False,
+                            action='store_true',
+                            help="Print debugging output")
 
         return parser
-
 
     def setup_debugging(self, debug):
         if not debug:
@@ -78,8 +74,6 @@ class GearmanAdminShell(object):
         self.setup_debugging(options.debug)
 
         print "Hello"
-
-
 
 
 def main():
