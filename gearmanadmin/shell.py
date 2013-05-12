@@ -7,6 +7,7 @@ import sys
 
 import gearmanadmin
 import actions
+import client
 
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,20 @@ class GearmanAdminShell(object):
     """
     Class for manipulate shell optional parameters
     """
+    @actions.arg('command', metavar='<subcommand>', nargs='?',
+                 help='Display help for <subcommand>')
+    def do_help(self, args):
+        """
+        Display help about this program or one of its subcommands.
+        """
+        if args.command:
+            if args.command in self.subcommands:
+                self.subcommands[args.command].print_help()
+            else:
+                raise exc.CommandError("'%s' is not a valid subcommand" % args.command)
+        else:
+            self.parser.print_help()
+    
     def get_base_parser(self, ):
         """
         Parse agrument paramenters and return parser object
@@ -122,13 +137,14 @@ class GearmanAdminShell(object):
             return 0
 
         args = subcommand_parser.parse_args(argv)
-        print args._get_args()
-        # Short-circuit and deal with help right away.
-        # if args.func == self.do_help:
-        #     self.do_help(args)
-        #     return 0
 
-        args.func(self, args)
+        # Short-circuit and deal with help right away.
+        if args.func == self.do_help:
+            self.do_help(args)
+            return 0
+#        client = GearmanAdminClient()
+
+        args.func(args)
 
 
 class GearmanAdminHelpFormatter(argparse.HelpFormatter):
