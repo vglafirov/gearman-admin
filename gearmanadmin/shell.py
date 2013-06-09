@@ -142,7 +142,8 @@ class GearmanAdminShell(object):
         if args.func == self.do_help:
             self.do_help(args)
             return 0
-#        client = GearmanAdminClient()
+            
+        client = GearmanAdminClient()
 
         args.func(args)
 
