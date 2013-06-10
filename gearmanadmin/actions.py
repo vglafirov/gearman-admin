@@ -1,5 +1,8 @@
 import prettytable
 import gearman
+from gearmanadmin import exceptions
+from gearmanadmin import GearmanAdminClient
+from gearmanadmin import GearmanConnector
 
 
 
@@ -36,10 +39,25 @@ def add_arg(f, *args, **kwargs):
         # to the options list positional options will appear to be backwards.
         f.arguments.insert(0, (args, kwargs))
 
-@arg('server', metavar='<server>', help='server hostname.')
-def do_status(client, args):
+@arg('server',
+     metavar='<server>',
+     help='Comma separated list of pairs hostname:port, port is optional default is 4730')
+def do_status(args):
     """
     Shows gearmand server status
     """
-    print args.server
-    
+    connectionString = []
+    hostlist = args.server.split(',')
+        
+    for i in xrange(0,len(hostlist)):
+        pair = hostlist[i].split(':')
+        if len(pair) > 2:
+            raise exceptions.MalformedHostListException(pair)
+        else:
+            try:
+                connectionString.append((pair[0],pair[1]))
+            except IndexError:
+                connectionString.append((pair[0],'4730'))
+    clientConnector = GearmanConnector(connectionString)
+    client = GearmanAdminClient(clientConnector)
+    client.get_status()

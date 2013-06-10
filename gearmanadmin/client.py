@@ -7,16 +7,15 @@ import gearmanadmin
 
 class GearmanConnector(object):
     """
+        Gearman connector class.
+    
+        :Parameters:
+    - `[(hostname, port)]`: list of tuples (hostname, port) describes gearman hostname and port 
     """
+
     connections = []
     
     def __init__(self, connectionPool):
-        """
-        Gearman connector class.
-        
-        :Parameters:
-         - `[(hostname, port)]`: list of tuples (hostname, port) describes gearman hostname and port 
-        """
         
         if len(connectionPool) == 0:
             raise gearmanadmin.EmptyServerListException()
@@ -25,7 +24,7 @@ class GearmanConnector(object):
             connectionString = ':'.join([server[0],server[1]])
             self.connections.append(gearman.GearmanAdminClient([connectionString]))
 
-    def cleanConnections(self, ):
+    def clean_up_connections(self, ):
         """
         Clean up server list. Remove all broken servers from connection pool.
         """
@@ -41,12 +40,16 @@ class GearmanAdminClient(object):
     """
     Gearman client class
     """
-    
     def __init__(self, connector):
         """
         Default constructor
         """
-        pass
-        
-        
-        
+        self.connector = connector
+
+    def get_status(self, ):
+        """
+        Return gearman server status
+        """
+        #self.connector.clean_up_connections()
+        for connection in self.connector.connections:
+            print connection.get_status()

@@ -143,8 +143,6 @@ class GearmanAdminShell(object):
             self.do_help(args)
             return 0
             
-        client = GearmanAdminClient()
-
         args.func(args)
 
 
