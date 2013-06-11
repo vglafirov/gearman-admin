@@ -55,3 +55,12 @@ class GearmanAdminClient(object):
         for connection in self.connector.connections:
             res.append(connection.get_status())
         return res
+
+    def get_version(self, ):
+        """
+        Return gearman server version
+        """
+        res = []
+        for connection in self.connector.connections:
+            res.append(connection.get_version())
+        return res

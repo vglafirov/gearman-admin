@@ -51,6 +51,8 @@ def add_arg(f, *args, **kwargs):
           port is optional default is 4730""")
 @arg("-t", "--total", action="store_true", dest="total",
      help="""Show totals for each gearmand server""")
+@arg("-v", "--version", action="store_true", dest="version",
+     help="""Show gearmand server version""")
 def do_status(args):
     """
     Shows gearmand server status
@@ -69,6 +71,12 @@ def do_status(args):
                 connectionString.append((pair[0], '4730'))
     clientConnector = GearmanConnector(connectionString)
     client = GearmanAdminClient(clientConnector)
+    
+    if args.version:
+        for (i, connection) in enumerate(connectionString):
+            print "{}: {}".format(connection[0], client.get_version()[i])
+        exit(0)
+
     result = client.get_status()
     table = PrettyTable(["Server", "Task", "Queued", "Running", "Workers"])
     table.align["Task"] = 'l'

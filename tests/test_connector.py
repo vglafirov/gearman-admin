@@ -1,6 +1,7 @@
 import unittest
 from mock import patch
-import gearmanadmin
+from gearmanadmin import GearmanConnector
+from gearmanadmin.exceptions import EmptyServerListException
 from gearman.errors import ServerUnavailable
 
 
@@ -11,22 +12,22 @@ class testGeramanConnector(unittest.TestCase):
         stub.ping_server.return_value = 0.38103294372558594
         if stub.call_count == 3:
             stub.ping_server.side_effect = ServerUnavailable
-        self.connector = gearmanadmin.GearmanConnector([
+        self.connector = GearmanConnector([
             ('dummyhost1', '4730'),
             ('dummyhost2', '4730'),
             ('brokenhost1','4730')
         ])
 
     def test_instance(self, ):
-        self.assertIsInstance(self.connector, gearmanadmin.GearmanConnector)
+        self.assertIsInstance(self.connector, GearmanConnector)
                     
     def test_empty_server_list(self, ):
-        with self.assertRaises(gearmanadmin.EmptyServerListException):
-            self.connector = gearmanadmin.GearmanConnector([])
+        with self.assertRaises(EmptyServerListException):
+            self.connector = GearmanConnector([])
 
     def test_clean_up_connection(self, ):
-        self.connector.cleanUpConnections()
-        cleanConnector = gearmanadmin.GearmanConnector([
+        self.connector.clean_up_connections()
+        cleanConnector = GearmanConnector([
             ('dummyhost1', '4730'),
             ('dummyhost2', '4730'),
         ])
