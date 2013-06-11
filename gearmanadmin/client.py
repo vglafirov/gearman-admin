@@ -50,6 +50,8 @@ class GearmanAdminClient(object):
         """
         Return gearman server status
         """
+        res = []
         #self.connector.clean_up_connections()
         for connection in self.connector.connections:
-            print connection.get_status()
+            res.append(connection.get_status())
+        return res

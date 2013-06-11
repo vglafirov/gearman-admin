@@ -18,8 +18,8 @@ setup(
             ['gearman-admin = gearmanadmin.shell:main']
     },
     install_requires=[
-        'prettytable==0.7.2',
-        'gearman==2.0.2'
+        'prettytable',
+        'gearman'
     ],
     test_suite='tests',
 )
